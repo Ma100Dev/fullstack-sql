@@ -8,7 +8,14 @@ const blogFinder = async (req, res, next) => {
 }
 
 router.get('/', async (req, res) => {
-    const blogs = await Blog.findAll()
+    const blogs = await Blog.findAll({
+        attributes: {
+            exclude: ['userId']
+        },
+        include: {
+            model: User, attributes: ['name']
+        }
+    })
     res.json(blogs)
 })
 
@@ -18,8 +25,13 @@ router.post('/', tokenExtractor, async (req, res) => {
     res.json(blog)
 })
 
-router.delete('/:id', async (req, res) => {
-    const blog = await Blog.destroy({
+router.delete('/:id',tokenExtractor, async (req, res) => {
+    const user = await User.findByPk(req.decodedToken.id)
+    let blog = await Blog.findByPk(req.params.id)
+    if (blog.userId !== user.id) {
+        res.status(403).end()
+    }
+    blog = await Blog.destroy({
         where: {
             id: req.params.id
         }
