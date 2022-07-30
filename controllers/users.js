@@ -1,5 +1,5 @@
 const router = require('express').Router()
-
+require('express-async-errors')
 const { User } = require('../models')
 
 router.get('/', async (req, res) => {
@@ -8,12 +8,8 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    try {
-        const user = await User.create(req.body)
-        res.json(user)
-    } catch (error) {
-        return res.status(400).json({ error })
-    }
+    const user = await User.create(req.body)
+    res.json(user)
 })
 
 router.put('/:username', async (req, res) => {

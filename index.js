@@ -13,12 +13,12 @@ const loginRouter = require('./controllers/login')
 const errorHandler = require('./middlewares/errorHandler')
 
 app.use(express.json())
-app.use(errorHandler)
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 
+app.use(errorHandler)
 const start = async () => {
     await connectToDatabase()
     app.listen(PORT, () => {
