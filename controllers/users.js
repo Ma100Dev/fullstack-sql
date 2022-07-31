@@ -1,6 +1,6 @@
 const router = require('express').Router()
 require('express-async-errors')
-const { sequelize } = require('../util/db')
+const sequelize = require('sequelize')
 const { User, Blog, ReadingList, ReadingListContent } = require('../models')
 
 router.get('/', async (req, res) => {
@@ -14,11 +14,21 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
+    let filter
+    let filterIsNullOrUndefined = false
+    if (req.query.read === 'true') {
+        filter = true
+    } else if (req.query.read === 'false') {
+        filter = false
+    } else {
+        filterIsNullOrUndefined = true
+    }
     const user = (await User.findByPk(req.params.id)).dataValues
     const reads = await ReadingList.findAll({
-        where: {
-            userId: req.params.id
-        },
+        where: [
+            { user_id: req.params.id },
+            filterIsNullOrUndefined ? null : sequelize.literal('"blogs->readingListContent"."read" = ' + filter)
+        ],
         include: {
             model: ReadingListContent,
             model: Blog,
