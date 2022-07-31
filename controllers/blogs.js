@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const tokenExtractor = require('../middlewares/tokenExtractor')
 const { Blog, User } = require('../models')
-const { sequelize } = require('../util/db')
 const { Op } = require('sequelize')
 require('express-async-errors')
 const blogFinder = async (req, res, next) => {
