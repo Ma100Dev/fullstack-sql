@@ -2,6 +2,7 @@ const router = require('express').Router()
 const tokenExtractor = require('../middlewares/tokenExtractor')
 const { Blog, User } = require('../models')
 const { sequelize } = require('../util/db')
+const { Op } = require('sequelize')
 require('express-async-errors')
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id)
@@ -9,7 +10,7 @@ const blogFinder = async (req, res, next) => {
 }
 
 router.get('/', async (req, res) => {
-    let title = req.query.title ? req.query.title.toLowerCase() : ''
+    let search = req.query.search ? req.query.search.toLowerCase() : ''
     const blogs = await Blog.findAll({
         attributes: {
             exclude: ['userId']
@@ -18,7 +19,18 @@ router.get('/', async (req, res) => {
             model: User, attributes: ['name']
         },
         where: {
-            title: sequelize.where(sequelize.fn('LOWER', sequelize.col('title')), 'LIKE', '%' + title + '%')
+            [Op.or]: [
+                {
+                    title: {
+                        [Op.iLike]: `%${search}%`,
+                    }
+                },
+                {
+                    author: {
+                        [Op.iLike]: `%${search}%`,
+                    }
+                }
+            ]
         }
     })
     res.json(blogs)
