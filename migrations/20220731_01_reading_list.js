@@ -41,8 +41,9 @@ module.exports = {
     },
     down: async ({ context: queryInterface }) => {
         try {
-            await queryInterface.removeConstraint('reading_list_contents', 'reading_list_contents_list_id_fkey')
+            await queryInterface.removeConstraint('reading_list_contents', 'reading_list_contents_reading_list_id_fkey')
             await queryInterface.removeConstraint('reading_lists', 'users_reading_list_id_fkey')
+            await queryInterface.removeConstraint('reading_list_contents', 'reading_list_contents_list_id_fkey')
         } catch (e) { }
         await queryInterface.dropTable('reading_lists')
         await queryInterface.dropTable('reading_list_contents')

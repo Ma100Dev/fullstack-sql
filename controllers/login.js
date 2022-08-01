@@ -3,6 +3,7 @@ const router = require('express').Router()
 require('express-async-errors')
 const { SECRET } = require('../util/config')
 const User = require('../models/user')
+const { Token } = require('../models')
 
 router.post('/', async (request, response) => {
     const body = request.body
@@ -27,6 +28,14 @@ router.post('/', async (request, response) => {
     }
 
     const token = jwt.sign(userForToken, SECRET)
+
+    await Token.destroy({
+        where: {userId: userForToken.id}
+    })
+    await Token.create({
+        token,
+        userId: userForToken.id
+    })
 
     response
         .status(200)

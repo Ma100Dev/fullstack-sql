@@ -39,9 +39,14 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', tokenExtractor, async (req, res) => {
-    const user = await User.findByPk(req.decodedToken.id)
-    const blog = await Blog.create({ ...req.body, userId: user.id })
-    res.json(blog)
+    try {
+        const user = await User.findByPk(req.decodedToken.id)
+        const blog = await Blog.create({ ...req.body, userId: user.id })
+        res.json(blog)
+    } catch (error) {
+        console.log(error)
+        res.status(401).json({ error: 'token invalid' })
+    }
 })
 
 router.delete('/:id', tokenExtractor, async (req, res) => {
